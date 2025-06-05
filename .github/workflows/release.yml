@@ -1,0 +1,101 @@
+name: 🚀 Release
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build-docker:
+    name: Build Docker
+    strategy:
+      matrix:
+        include:
+          - dockerfile: ubuntu.Dockerfile
+            runs-on: ubuntu-22.04
+            platform: linux/amd64
+            base-image: ubuntu:24.04
+            target-tag: ubuntu-24-04-amd
+          - dockerfile: ubuntu.Dockerfile
+            runs-on: ubuntu-22.04-arm
+            platform: linux/arm64
+            base-image: ubuntu:24.04
+            target-tag: ubuntu-24-04-arm
+          - dockerfile: alpine.Dockerfile
+            runs-on: ubuntu-22.04-arm
+            platform: linux/arm64
+            base-image: alpine:3
+            target-tag: alpine-3-arm
+          - dockerfile: alpine.Dockerfile
+            runs-on: ubuntu-22.04
+            platform: linux/amd64
+            base-image: alpine:3
+            target-tag: alpine-3-amd
+
+    runs-on: ${{ matrix.runs-on }}
+    continue-on-error: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare Docker
+        uses: docker/setup-qemu-action@v3
+
+      - name: Build Docker Image
+        run: |
+          DOCKER_BUILDKIT=1 docker build --platform ${{ matrix.platform }} \
+            -t localhost/build-base:${{ matrix.target-tag }} \
+            --build-arg BASE_IMAGE=${{ matrix.base-image }} \
+            -f images/${{ matrix.dockerfile }} .
+          docker save -o /tmp/build-base.tar localhost/build-base:${{ matrix.target-tag }}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-${{ matrix.target-tag }}
+          path: /tmp/build-base.tar
+
+  publish:
+    name: Publish
+    runs-on: ubuntu-24.04
+    needs:
+      - build-docker
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Load Docker
+        run: |
+          docker load -i docker-ubuntu-24-04-amd/build-base.tar
+          docker load -i docker-ubuntu-24-04-arm/build-base.tar
+          docker load -i docker-alpine-3-amd/build-base.tar
+          docker load -i docker-alpine-3-arm/build-base.tar
+          docker images
+
+      - name: Login to Quay.io
+        uses: docker/login-action@v3
+        if: github.ref == 'refs/heads/main' && github.repository == 'vakamo-labs/build-base'
+        with:
+          registry: quay.io
+          username: vakamo+github_actions_build_base
+          password: ${{ secrets.QUAY_PASSWORD }}
+
+      - name: Push Latest Tag to quay.io
+        if: github.ref == 'refs/heads/main' && github.repository == 'vakamo-labs/build-base'
+        run: |
+          docker tag localhost/build-base:ubuntu-24-04-amd quay.io/vakamo/build-base:ubuntu-24-04-amd
+          docker tag localhost/build-base:ubuntu-24-04-arm quay.io/vakamo/build-base:ubuntu-24-04-arm
+          docker tag localhost/build-base:alpine-3-amd quay.io/vakamo/build-base:alpine-3-amd
+          docker tag localhost/build-base:alpine-3-arm quay.io/vakamo/build-base:alpine-3-arm
+          docker push quay.io/vakamo/build-base:ubuntu-24-04-amd
+          docker push quay.io/vakamo/build-base:ubuntu-24-04-arm
+          docker push quay.io/vakamo/build-base:alpine-3-amd
+          docker push quay.io/vakamo/build-base:alpine-3-arm
+          docker manifest rm quay.io/vakamo/build-base:ubuntu-24-04 || true
+          docker manifest rm quay.io/vakamo/build-base:alpine-3 || true
+          docker manifest create quay.io/vakamo/build-base:ubuntu-24-04 quay.io/vakamo/build-base:ubuntu-24-04-amd quay.io/vakamo/build-base:ubuntu-24-04-arm
+          docker manifest push quay.io/lakekeeper/catalog:latest-main
+          docker manifest create quay.io/vakamo/build-base:alpine-3 quay.io/vakamo/build-base:alpine-3-amd quay.io/vakamo/build-base:alpine-3-arm
+          docker manifest push quay.io/vakamo/build-base:alpine-3
