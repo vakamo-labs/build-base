@@ -28,12 +28,12 @@ jobs:
           - dockerfile: alpine.Dockerfile
             runs-on: ubuntu-24.04-arm
             platform: linux/arm64
-            base-image: alpine:3
+            base-image: rust:1-alpine
             target-tag: alpine-3-arm
           - dockerfile: alpine.Dockerfile
             runs-on: ubuntu-24.04
             platform: linux/amd64
-            base-image: alpine:3
+            base-image: rust:1-alpine
             target-tag: alpine-3-amd
 
     runs-on: ${{ matrix.runs-on }}
