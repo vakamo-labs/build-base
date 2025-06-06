@@ -10,5 +10,3 @@ RUN apk update && apk upgrade && \
     rm -rf /var/cache/apk/*
 
 WORKDIR /build
-ENV SQLX_OFFLINE=true
-ENV RUST_BACKTRACE=full

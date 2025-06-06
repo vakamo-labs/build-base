@@ -12,5 +12,3 @@ RUN apt-get update && apt-get upgrade -y && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /build
-ENV SQLX_OFFLINE=true
-ENV RUST_BACKTRACE=full
