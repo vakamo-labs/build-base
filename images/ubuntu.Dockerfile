@@ -6,7 +6,7 @@ LABEL maintainer="Vakamo, Inc." quay.expires-after=${EXPIRES}
 
 RUN apt-get update && apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
-    ca-certificates gcc g++ build-essential curl perl git bash cmake pkg-config python3 buildah podman \
+    ca-certificates fuse-overlayfs gcc g++ build-essential curl perl git bash cmake pkg-config python3 buildah podman \
     linux-headers-generic clang libclang-dev llvm && \
     # Add Docker's official GPG key
     install -m 0755 -d /etc/apt/keyrings && \
@@ -19,7 +19,7 @@ RUN apt-get update && apt-get upgrade -y && \
     tee /etc/apt/sources.list.d/docker.list > /dev/null && \
     apt-get update && \
     # Install Docker packages
-    apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin && \
+    apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin && \
     # Clean up
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
