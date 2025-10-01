@@ -5,7 +5,7 @@ ARG EXPIRES=2y
 LABEL maintainer="Vakamo, Inc." quay.expires-after=${EXPIRES}
 
 RUN apt-get update -yqq && apt-get install -yqq --no-install-recommends \
-    just ca-certificates fuse-overlayfs wget gcc g++ build-essential lsb-release curl perl git bash cmake pkg-config python3 buildah podman \
+    libssl-dev just ca-certificates fuse-overlayfs wget gcc g++ build-essential lsb-release curl perl git bash cmake pkg-config python3 buildah podman \
     linux-headers-generic clang libclang-dev llvm && \
     # gh cli
     mkdir -p -m 755 /etc/apt/keyrings && \
