@@ -94,13 +94,21 @@ jobs:
       - name: Load Docker
         run: |
           docker load -i docker-ubuntu-24-04-amd/build-base.tar
+          rm docker-ubuntu-24-04-amd/build-base.tar
           docker load -i docker-ubuntu-24-04-arm/build-base.tar
+          rm docker-ubuntu-24-04-arm/build-base.tar
           docker load -i docker-ubuntu-22-04-amd/build-base.tar
+          rm docker-ubuntu-22-04-amd/build-base.tar
           docker load -i docker-ubuntu-22-04-arm/build-base.tar
+          rm docker-ubuntu-22-04-arm/build-base.tar
           docker load -i docker-alpine-3-amd/build-base.tar
+          rm docker-alpine-3-amd/build-base.tar
           docker load -i docker-alpine-3-arm/build-base.tar
+          rm docker-alpine-3-arm/build-base.tar
           docker load -i docker-debian-12-amd/build-base.tar
+          rm docker-debian-12-amd/build-base.tar
           docker load -i docker-debian-12-arm/build-base.tar
+          rm docker-debian-12-arm/build-base.tar
           docker images
 
       - name: Login to Quay.io
