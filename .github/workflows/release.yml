@@ -25,6 +25,16 @@ jobs:
             platform: linux/arm64
             base-image: ubuntu:24.04
             target-tag: ubuntu-24-04-arm
+          - dockerfile: ubuntu-22.04.Dockerfile
+            runs-on: ubuntu-24.04
+            platform: linux/amd64
+            base-image: ubuntu:22.04
+            target-tag: ubuntu-22-04-amd
+          - dockerfile: ubuntu-22.04.Dockerfile
+            runs-on: ubuntu-24.04-arm
+            platform: linux/arm64
+            base-image: ubuntu:22.04
+            target-tag: ubuntu-22-04-arm
           - dockerfile: alpine.Dockerfile
             runs-on: ubuntu-24.04-arm
             platform: linux/arm64
@@ -85,6 +95,8 @@ jobs:
         run: |
           docker load -i docker-ubuntu-24-04-amd/build-base.tar
           docker load -i docker-ubuntu-24-04-arm/build-base.tar
+          docker load -i docker-ubuntu-22-04-amd/build-base.tar
+          docker load -i docker-ubuntu-22-04-arm/build-base.tar
           docker load -i docker-alpine-3-amd/build-base.tar
           docker load -i docker-alpine-3-arm/build-base.tar
           docker load -i docker-debian-12-amd/build-base.tar
@@ -108,6 +120,8 @@ jobs:
           # Tag and push images with latest tags
           docker tag localhost/build-base:ubuntu-24-04-amd quay.io/vakamo/build-base:ubuntu-24-04-amd
           docker tag localhost/build-base:ubuntu-24-04-arm quay.io/vakamo/build-base:ubuntu-24-04-arm
+          docker tag localhost/build-base:ubuntu-22-04-amd quay.io/vakamo/build-base:ubuntu-22-04-amd
+          docker tag localhost/build-base:ubuntu-22-04-arm quay.io/vakamo/build-base:ubuntu-22-04-arm
           docker tag localhost/build-base:alpine-3-amd quay.io/vakamo/build-base:alpine-3-amd
           docker tag localhost/build-base:alpine-3-arm quay.io/vakamo/build-base:alpine-3-arm
           docker tag localhost/build-base:debian-12-amd quay.io/vakamo/build-base:debian-12-amd
@@ -116,6 +130,8 @@ jobs:
           # Tag and push images with date tags
           docker tag localhost/build-base:ubuntu-24-04-amd quay.io/vakamo/build-base:ubuntu-24-04-amd-$DATE
           docker tag localhost/build-base:ubuntu-24-04-arm quay.io/vakamo/build-base:ubuntu-24-04-arm-$DATE
+          docker tag localhost/build-base:ubuntu-22-04-amd quay.io/vakamo/build-base:ubuntu-22-04-amd-$DATE
+          docker tag localhost/build-base:ubuntu-22-04-arm quay.io/vakamo/build-base:ubuntu-22-04-arm-$DATE
           docker tag localhost/build-base:alpine-3-amd quay.io/vakamo/build-base:alpine-3-amd-$DATE
           docker tag localhost/build-base:alpine-3-arm quay.io/vakamo/build-base:alpine-3-arm-$DATE
           docker tag localhost/build-base:debian-12-amd quay.io/vakamo/build-base:debian-12-amd-$DATE
@@ -124,12 +140,16 @@ jobs:
           # Push all tagged images
           docker push quay.io/vakamo/build-base:ubuntu-24-04-amd
           docker push quay.io/vakamo/build-base:ubuntu-24-04-arm
+          docker push quay.io/vakamo/build-base:ubuntu-22-04-amd
+          docker push quay.io/vakamo/build-base:ubuntu-22-04-arm
           docker push quay.io/vakamo/build-base:alpine-3-amd
           docker push quay.io/vakamo/build-base:alpine-3-arm
           docker push quay.io/vakamo/build-base:debian-12-amd
           docker push quay.io/vakamo/build-base:debian-12-arm
           docker push quay.io/vakamo/build-base:ubuntu-24-04-amd-$DATE
           docker push quay.io/vakamo/build-base:ubuntu-24-04-arm-$DATE
+          docker push quay.io/vakamo/build-base:ubuntu-22-04-amd-$DATE
+          docker push quay.io/vakamo/build-base:ubuntu-22-04-arm-$DATE
           docker push quay.io/vakamo/build-base:alpine-3-amd-$DATE
           docker push quay.io/vakamo/build-base:alpine-3-arm-$DATE
           docker push quay.io/vakamo/build-base:debian-12-amd-$DATE
@@ -137,10 +157,13 @@ jobs:
           
           # Create and push manifests for combined images
           docker manifest rm quay.io/vakamo/build-base:ubuntu-24-04 || true
+          docker manifest rm quay.io/vakamo/build-base:ubuntu-22-04 || true
           docker manifest rm quay.io/vakamo/build-base:alpine-3 || true
           docker manifest rm quay.io/vakamo/build-base:debian-12 || true
           docker manifest create quay.io/vakamo/build-base:ubuntu-24-04 quay.io/vakamo/build-base:ubuntu-24-04-amd quay.io/vakamo/build-base:ubuntu-24-04-arm
           docker manifest push quay.io/vakamo/build-base:ubuntu-24-04
+          docker manifest create quay.io/vakamo/build-base:ubuntu-22-04 quay.io/vakamo/build-base:ubuntu-22-04-amd quay.io/vakamo/build-base:ubuntu-22-04-arm
+          docker manifest push quay.io/vakamo/build-base:ubuntu-22-04
           docker manifest create quay.io/vakamo/build-base:alpine-3 quay.io/vakamo/build-base:alpine-3-amd quay.io/vakamo/build-base:alpine-3-arm
           docker manifest push quay.io/vakamo/build-base:alpine-3
           docker manifest create quay.io/vakamo/build-base:debian-12 quay.io/vakamo/build-base:debian-12-amd quay.io/vakamo/build-base:debian-12-arm
@@ -149,6 +172,8 @@ jobs:
           # Create and push manifests with date tags
           docker manifest create quay.io/vakamo/build-base:ubuntu-24-04-$DATE quay.io/vakamo/build-base:ubuntu-24-04-amd-$DATE quay.io/vakamo/build-base:ubuntu-24-04-arm-$DATE
           docker manifest push quay.io/vakamo/build-base:ubuntu-24-04-$DATE
+          docker manifest create quay.io/vakamo/build-base:ubuntu-22-04-$DATE quay.io/vakamo/build-base:ubuntu-22-04-amd-$DATE quay.io/vakamo/build-base:ubuntu-22-04-arm-$DATE
+          docker manifest push quay.io/vakamo/build-base:ubuntu-22-04-$DATE
           docker manifest create quay.io/vakamo/build-base:alpine-3-$DATE quay.io/vakamo/build-base:alpine-3-amd-$DATE quay.io/vakamo/build-base:alpine-3-arm-$DATE
           docker manifest push quay.io/vakamo/build-base:alpine-3-$DATE
           docker manifest create quay.io/vakamo/build-base:debian-12-$DATE quay.io/vakamo/build-base:debian-12-amd-$DATE quay.io/vakamo/build-base:debian-12-arm-$DATE
