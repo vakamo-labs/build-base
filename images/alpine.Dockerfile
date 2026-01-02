@@ -6,7 +6,7 @@ LABEL maintainer="Vakamo, Inc." quay.expires-after=${EXPIRES}
 
 RUN apk update && apk upgrade && \
     apk add --no-cache \
-    ca-certificates gcc build-base curl perl nodejs npm git bash cmake pkgconf python3 linux-headers && \
+    ca-certificates gcc build-base curl perl nodejs npm git bash cmake pkgconf python3 linux-headers openssh-client && \
     rm -rf /var/cache/apk/*
 
 WORKDIR /build

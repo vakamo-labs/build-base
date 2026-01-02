@@ -6,7 +6,7 @@ LABEL maintainer="Vakamo, Inc." quay.expires-after=${EXPIRES}
 
 RUN apt-get update -yqq && apt-get install -yqq --no-install-recommends \
     libssl-dev ca-certificates fuse-overlayfs wget gcc g++ build-essential lsb-release curl perl git bash cmake pkg-config python3 buildah podman \
-    linux-headers-generic clang libclang-dev llvm && \
+    linux-headers-generic clang libclang-dev llvm openssh-client && \
     # Install just from GitHub releases
     JUST_VERSION=$(curl -s https://api.github.com/repos/casey/just/releases/latest | grep -o '"tag_name": "[^"]*' | cut -d'"' -f4) && \
     wget -O just.tar.gz "https://github.com/casey/just/releases/download/${JUST_VERSION}/just-${JUST_VERSION}-x86_64-unknown-linux-musl.tar.gz" && \
