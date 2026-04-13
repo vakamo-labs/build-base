@@ -7,15 +7,17 @@ LABEL maintainer="Vakamo, Inc." quay.expires-after=${EXPIRES}
 RUN apt-get update -yqq && apt-get install -yqq --no-install-recommends \
     libssl-dev ca-certificates fuse-overlayfs wget gcc g++ build-essential lsb-release curl perl git bash cmake pkg-config python3 buildah podman \
     linux-headers-generic clang libclang-dev llvm openssh-client && \
-    # Install just from GitHub releases
+    # Install just from GitHub releases (multi-arch)
     JUST_VERSION=$(curl -s https://api.github.com/repos/casey/just/releases/latest | grep -o '"tag_name": "[^"]*' | cut -d'"' -f4) && \
-    wget -O just.tar.gz "https://github.com/casey/just/releases/download/${JUST_VERSION}/just-${JUST_VERSION}-x86_64-unknown-linux-musl.tar.gz" && \
+    JUST_ARCH="$(uname -m)-unknown-linux-musl" && \
+    wget -O just.tar.gz "https://github.com/casey/just/releases/download/${JUST_VERSION}/just-${JUST_VERSION}-${JUST_ARCH}.tar.gz" && \
     tar -xzf just.tar.gz && \
     mv just /usr/local/bin/ && \
     rm just.tar.gz && \
-    # Install yq from GitHub releases
+    # Install yq from GitHub releases (multi-arch)
     YQ_VERSION=$(curl -s https://api.github.com/repos/mikefarah/yq/releases/latest | grep -o '"tag_name": "[^"]*' | cut -d'"' -f4) && \
-    wget -O /usr/local/bin/yq "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_amd64" && \
+    YQ_ARCH=$(dpkg --print-architecture) && \
+    wget -O /usr/local/bin/yq "https://github.com/mikefarah/yq/releases/download/${YQ_VERSION}/yq_linux_${YQ_ARCH}" && \
     chmod +x /usr/local/bin/yq && \
     # gh cli
     mkdir -p -m 755 /etc/apt/keyrings && \
